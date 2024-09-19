@@ -5,5 +5,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface SystemUserService extends UserDetailsService {
     public void signup(RequestSystemUserDto dto);
+
+    public void verifyEmail(String email,String otp);
+
     public void initializeSystemAdmin();
 }

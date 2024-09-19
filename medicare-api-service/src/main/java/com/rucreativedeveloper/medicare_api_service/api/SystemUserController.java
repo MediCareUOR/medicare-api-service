@@ -27,4 +27,15 @@ public class SystemUserController {
                 HttpStatus.CREATED
         );
     }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<StandardResponseDto> verifyEmail(@RequestBody String otp,@RequestBody String email) {
+        userService.verifyEmail(email,otp);
+        return new ResponseEntity<>(
+          new StandardResponseDto(201,"Email successfully verified",null),HttpStatus.OK
+        );
+    }
+
+
+
 }
