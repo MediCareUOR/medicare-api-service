@@ -10,6 +10,7 @@ import com.rucreativedeveloper.medicare_api_service.repository.SystemUserRepo;
 import com.rucreativedeveloper.medicare_api_service.repository.UserRoleRepo;
 import com.rucreativedeveloper.medicare_api_service.security.ApplicationSecurityUser;
 import com.rucreativedeveloper.medicare_api_service.service.SystemUserService;
+import com.rucreativedeveloper.medicare_api_service.util.Generator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class SystemUserServiceImpl implements SystemUserService {
     private final SystemUserRepo systemUserRepo;
     private final UserRoleRepo userRoleRepo;
     private final PasswordEncoder passwordEncoder;
+    private final Generator generator;
 
     @Override
     public void signup(RequestSystemUserDto dto) {
@@ -56,13 +59,22 @@ public class SystemUserServiceImpl implements SystemUserService {
                 .roles(roles)// USER,ADMIN,PHARMACIST
                 .isAccountNonLocked(true)
                 .isCredentialsNonExpired(true)
-                .isEnabled(true)
+                .isEnabled(false)
                 .password(passwordEncoder.encode(dto.getPassword()))// encrypt
                 .username(dto.getUsername())
+                .otp(generator.generateOtp(4))
                 .build();
 
         systemUserRepo.save(systemUser);
     }
+
+    @Override
+    public void verifyEmail(String email, String otp) {
+
+
+
+    }
+
 
     @Override
     public void initializeSystemAdmin() {
