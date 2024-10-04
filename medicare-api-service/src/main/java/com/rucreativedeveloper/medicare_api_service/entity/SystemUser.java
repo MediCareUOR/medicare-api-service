@@ -39,12 +39,19 @@ public class SystemUser {
     @Column(length = 10, name = "otp")
     private String otp;
 
+
+    @OneToOne(mappedBy = "systemUser",cascade = CascadeType.ALL)
+    private Pharmacist pharmacist;
+
     @ManyToMany
     @JoinTable(name="user_role_detail",
-    joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name="role_id"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name="role_id"))
     private Set<UserRole> roles;
 
 
 
+
 }
+
+

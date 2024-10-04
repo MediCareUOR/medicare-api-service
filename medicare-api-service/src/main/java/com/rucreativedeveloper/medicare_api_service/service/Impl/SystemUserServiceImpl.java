@@ -10,6 +10,7 @@ import com.rucreativedeveloper.medicare_api_service.repository.SystemUserRepo;
 import com.rucreativedeveloper.medicare_api_service.repository.UserRoleRepo;
 import com.rucreativedeveloper.medicare_api_service.security.ApplicationSecurityUser;
 import com.rucreativedeveloper.medicare_api_service.service.SystemUserService;
+import com.rucreativedeveloper.medicare_api_service.service.process.EmailService;
 import com.rucreativedeveloper.medicare_api_service.util.Generator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.rucreativedeveloper.medicare_api_service.security.ApplicationUserRole.*;
 
@@ -36,11 +34,16 @@ public class SystemUserServiceImpl implements SystemUserService {
     private final UserRoleRepo userRoleRepo;
     private final PasswordEncoder passwordEncoder;
     private final Generator generator;
+    private final EmailService emailService;
 
     @Override
-    public void signup(RequestSystemUserDto dto) {
-        Optional<SystemUser> selectedUserData = systemUserRepo.findByUsername(dto.getUsername());
-        if (selectedUserData.isPresent()) {
+    public void signupUser(RequestSystemUserDto dto) throws IOException {
+
+        SystemUser selectedUserData = systemUserRepo.findByUsername(dto.getUsername());
+
+        String otp= generator.generateOtp(4);
+
+        if (selectedUserData!=null) {
             throw new DuplicateEntryException("User email already exists");
         }
 
@@ -55,31 +58,48 @@ public class SystemUserServiceImpl implements SystemUserService {
 
         SystemUser systemUser = SystemUser.builder()
                 .userId(UUID.randomUUID().toString())
+                .username(dto.getUsername())
                 .isAccountNonExpired(true)
                 .roles(roles)// USER,ADMIN,PHARMACIST
                 .isAccountNonLocked(true)
                 .isCredentialsNonExpired(true)
                 .isEnabled(false)
                 .password(passwordEncoder.encode(dto.getPassword()))// encrypt
-                .username(dto.getUsername())
-                .otp(generator.generateOtp(4))
+                .createdDate(new Date())
+                .otp(otp)
                 .build();
 
         systemUserRepo.save(systemUser);
+
+        emailService.sendUserSignupVerificationCode(systemUser.getUsername(), "Verify Your Email Address for MediCare Access",otp);
+
+
     }
 
     @Override
-    public void verifyEmail(String email, String otp) {
+    public boolean verifyEmail(String email, String otp) {
 
+        SystemUser user=systemUserRepo.findByUsername(email);
 
+        if(user.isEnabled()){
+            throw new DuplicateEntryException("User Already Verified");
+        }
+
+        if(user.getOtp()==otp){
+            user.setEnabled(true);
+            systemUserRepo.save(user);
+            return true;
+        }else{
+            throw new EntryNotFoundException("You Entered A Wrong OTP");
+        }
 
     }
 
 
     @Override
     public void initializeSystemAdmin() {
-        Optional<SystemUser> selectedUserData = systemUserRepo.findByUsername("medicare.uor@gmail.com");
-        if (selectedUserData.isPresent()) {
+       SystemUser selectedUserData = systemUserRepo.findByUsername("medicare.uor@gmail.com");
+        if (selectedUserData!=null) {
             return;
         }
 
@@ -99,6 +119,7 @@ public class SystemUserServiceImpl implements SystemUserService {
                 .isAccountNonLocked(true)
                 .isCredentialsNonExpired(true)
                 .isEnabled(true)
+                .createdDate(new Date())
                 .password(passwordEncoder.encode("1234"))// encrypt
                 .username("medicare.uor@gmail.com")
                 .build();
@@ -108,14 +129,14 @@ public class SystemUserServiceImpl implements SystemUserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<SystemUser> selectedUserData = systemUserRepo.findByUsername(username);
-        if(selectedUserData.isEmpty()){
+        SystemUser selectedUserData = systemUserRepo.findByUsername(username);
+        if(selectedUserData==null){
             throw new EntryNotFoundException(String.format("username %s not found",username));
         }
 
         Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
 
-        for(UserRole r : selectedUserData.get().getRoles()){
+        for(UserRole r : selectedUserData.getRoles()){
             if(r.getRoleName().equals("ADMIN")){
                 grantedAuthorities.addAll(ADMIN.grantedAuthorities());
             }
@@ -128,12 +149,12 @@ public class SystemUserServiceImpl implements SystemUserService {
         }
 
         return new ApplicationSecurityUser(
-                selectedUserData.get().getUsername(),
-                selectedUserData.get().getPassword(),
-                selectedUserData.get().isAccountNonExpired(),
-                selectedUserData.get().isAccountNonLocked(),
-                selectedUserData.get().isAccountNonExpired(),
-                selectedUserData.get().isEnabled(),
+                selectedUserData.getUsername(),
+                selectedUserData.getPassword(),
+                selectedUserData.isAccountNonExpired(),
+                selectedUserData.isAccountNonLocked(),
+                selectedUserData.isAccountNonExpired(),
+                selectedUserData.isEnabled(),
                 grantedAuthorities
         );
 

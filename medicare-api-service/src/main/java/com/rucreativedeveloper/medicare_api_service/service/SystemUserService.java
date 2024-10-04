@@ -3,10 +3,14 @@ package com.rucreativedeveloper.medicare_api_service.service;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestSystemUserDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface SystemUserService extends UserDetailsService {
-    public void signup(RequestSystemUserDto dto);
+import java.io.IOException;
 
-    public void verifyEmail(String email,String otp);
+public interface SystemUserService extends UserDetailsService {
+    public void signupUser(RequestSystemUserDto dto) throws IOException;
+
+    public boolean verifyEmail(String email, String otp);
 
     public void initializeSystemAdmin();
+
+
 }
