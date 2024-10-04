@@ -10,4 +10,7 @@ public interface UserRoleRepo extends JpaRepository<UserRole,String> {
 
     public Optional<UserRole> findByRoleName(String role);
 
+
+
+
 }
