@@ -41,8 +41,8 @@ public class Pharmacy {
     @Column(name="latitude",length=45)
     private String latitude;
 
-    @OneToMany(mappedBy = "pharmacy",cascade = CascadeType.ALL)
-    private Set<Pharmacist> pharmacists;
+    @OneToOne(mappedBy = "pharmacy")
+    private Pharmacist pharmacist;
 
 
 
