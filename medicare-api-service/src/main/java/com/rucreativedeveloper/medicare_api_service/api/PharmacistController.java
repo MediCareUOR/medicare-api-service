@@ -1,6 +1,7 @@
 package com.rucreativedeveloper.medicare_api_service.api;
 
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestPharmacistDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistDto;
 import com.rucreativedeveloper.medicare_api_service.service.PharmacistService;
 import com.rucreativedeveloper.medicare_api_service.util.StandardResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +26,14 @@ public class PharmacistController {
                 new StandardResponseDto(201,"Pharmacist successfully registered",requestPharmacistDto), HttpStatus.CREATED
         );
 
+
     }
 
 
     @PutMapping("update-pharmacist/{pharmacistId}")
     public ResponseEntity<StandardResponseDto> updatePharmacist(@PathVariable(name = "pharmacistId") String pharmacistId, @RequestBody RequestPharmacistDto requestPharmacistDto) {
+
+        pharmacistService.updatePharmacist(pharmacistId, requestPharmacistDto);
 
         return new ResponseEntity<>(
                 new StandardResponseDto(201,"Successfully updated",requestPharmacistDto), HttpStatus.OK
@@ -40,12 +44,48 @@ public class PharmacistController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<StandardResponseDto> deletePharmacist(@PathVariable("pharmacistId") String pharmacistId) {
 
+        pharmacistService.deletePharmacist(pharmacistId);
 
         return new ResponseEntity<>(
                 new StandardResponseDto(201,"Successfully deleted",pharmacistId), HttpStatus.OK
         );
+
+
+
     }
 
+
+
+    @GetMapping("get-by-id/{pharmacistId}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_PHARMACIST')")
+    public ResponseEntity<StandardResponseDto> getPharmacistById(@PathVariable("pharmacistId") String pharmacistId) {
+
+        ResponsePharmacistDto responsePharmacistDto=pharmacistService.findPharmacist(pharmacistId);
+
+        if(responsePharmacistDto==null) {
+            return new ResponseEntity<>(
+                    new StandardResponseDto(201,"Something went wrong",null), HttpStatus.NOT_FOUND
+            );
+        }
+
+        return new ResponseEntity<>(
+                new StandardResponseDto(201,"Successfully retrieved",responsePharmacistDto), HttpStatus.OK
+        );
+    }
+
+    @GetMapping("get-all")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<StandardResponseDto> getAllPharmacist(
+            @RequestParam String searchText,
+            @RequestParam int page,
+            @RequestParam int size
+    ){
+
+        return new ResponseEntity<>(
+                new StandardResponseDto(201,"Your Pharmacists are",searchText), HttpStatus.OK
+        );
+
+    }
 
 
 }

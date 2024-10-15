@@ -1,21 +1,22 @@
 package com.rucreativedeveloper.medicare_api_service.service;
 
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponsePharmacistPaginatedDto;
+import com.rucreativedeveloper.medicare_api_service.dto.request.RequestDrugDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestPharmacistDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseDrugDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistDto;
-import com.rucreativedeveloper.medicare_api_service.entity.Pharmacist;
 
-import java.util.List;
 
-public interface PharmacistService {
+public interface DrugService {
+    public void createDrug(RequestDrugDto requestDrugDto,String token);
 
-    void registerPharmacist(RequestPharmacistDto requestPharmacistDto);
+    void updateDrug(String drugId, RequestDrugDto requestDrugDto);
 
-    void updatePharmacist(String pharmacistId, RequestPharmacistDto requestPharmacistDto);
+    void deleteDrug(String drugId);
 
-    void deletePharmacist(String pharmacistId);
-
-    public ResponsePharmacistDto findPharmacist(String pharmacistId);
+    public ResponseDrugDto findPharmacist(String drugId);
 
     public ResponsePharmacistPaginatedDto findAllPharmacist(String searchText, int page, int size);
+
+
 }

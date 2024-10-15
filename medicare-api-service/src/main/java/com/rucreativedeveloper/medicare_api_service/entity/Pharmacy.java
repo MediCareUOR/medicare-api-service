@@ -41,8 +41,11 @@ public class Pharmacy {
     @Column(name="latitude",length=45)
     private String latitude;
 
-    @OneToOne(mappedBy = "pharmacy")
+    @OneToOne(mappedBy = "pharmacy",cascade = CascadeType.ALL)
     private Pharmacist pharmacist;
+
+    @OneToOne(mappedBy = "pharmacy",cascade = CascadeType.ALL)
+    private DrugInventory drugInventory;
 
 
 

@@ -15,6 +15,6 @@ public class ResponsePharmacistDto {
     private String pharmacistName;
     private String phoneNumber;
 
-
+    private ResponsePharmacyDto responsePharmacy;
 
 }

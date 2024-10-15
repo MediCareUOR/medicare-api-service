@@ -24,11 +24,11 @@ public class Pharmacist {
 
     private String address;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id",referencedColumnName = "user_id")
     private SystemUser systemUser;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name="pharmacy_id",referencedColumnName = "pharmacy_id")
     private Pharmacy pharmacy;
 

@@ -59,6 +59,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfiguration {
 
                         .requestMatchers("/api/v1/system-users/visitor/**").permitAll()
                         .requestMatchers("/api/v1/pharmacist/**").permitAll()
+                        .requestMatchers("api/v1/drugs/**").permitAll()
                         .anyRequest()
                         .authenticated());
         return security.build();
