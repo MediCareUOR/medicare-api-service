@@ -1,5 +1,6 @@
 package com.rucreativedeveloper.medicare_api_service.service;
 
+import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponseDrugPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponsePharmacistPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestDrugDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestPharmacistDto;
@@ -14,9 +15,10 @@ public interface DrugService {
 
     void deleteDrug(String drugId);
 
-    public ResponseDrugDto findPharmacist(String drugId);
+    public ResponseDrugDto findDrug(String drugId,String token);
 
-    public ResponsePharmacistPaginatedDto findAllPharmacist(String searchText, int page, int size);
+    public ResponseDrugPaginatedDto findAllDrugs(String token, String searchText, int page, int size);
+
 
 
 }

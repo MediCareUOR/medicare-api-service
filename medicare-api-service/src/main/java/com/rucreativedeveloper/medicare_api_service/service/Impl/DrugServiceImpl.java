@@ -1,5 +1,6 @@
 package com.rucreativedeveloper.medicare_api_service.service.Impl;
 
+import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponseDrugPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponsePharmacistPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestDrugDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseDrugDto;
@@ -14,9 +15,11 @@ import com.rucreativedeveloper.medicare_api_service.repository.DrugRepo;
 import com.rucreativedeveloper.medicare_api_service.repository.PharmacyRepo;
 import com.rucreativedeveloper.medicare_api_service.service.DrugService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,6 +65,8 @@ public class DrugServiceImpl implements DrugService {
 
     @Override
     public void updateDrug(String drugId, RequestDrugDto requestDrugDto) {
+
+
         Optional<Drug> selectedDrug=drugRepo.findById(drugId);
 
         if(selectedDrug.isEmpty()){
@@ -91,14 +96,81 @@ public class DrugServiceImpl implements DrugService {
     }
 
     @Override
-    public ResponseDrugDto findPharmacist(String drugId) {
+    public ResponseDrugDto findDrug(String drugId,String token) {
+
+        Optional<Drug> foundDrug=drugRepo.findById(drugId);
+
+        if(foundDrug.isEmpty()){
+            throw new EntryNotFoundException("Drug not found");
+        }
+
+        String DrugInventoryId=foundDrug.get().getInventory().getInventoryId();
+
+        if(Objects.equals(DrugInventoryId, getUserInventoryId(token))){
+            Drug drug=foundDrug.get();
+
+
+            return ResponseDrugDto.builder()
+                    .drugId(drug.getDrugId())
+                    .drugName(drug.getDrugName())
+                    .drugDescription(drug.getDrugDescription())
+                    .stockQty(drug.getStockQty())
+                    .build();
+        }
+
+
         return null;
     }
 
     @Override
-    public ResponsePharmacistPaginatedDto findAllPharmacist(String searchText, int page, int size) {
-        return null;
+    public ResponseDrugPaginatedDto findAllDrugs(String token, String searchText, int page, int size) {
+
+
+        String drugInventoryId=getUserInventoryId(token);
+
+        if (drugInventoryId==null){
+            throw new EntryNotFoundException("You don't have any Inventory Id");
+        }
+
+        return ResponseDrugPaginatedDto.builder()
+                .dataList(drugRepo.findAllDrugsWithSearchText(searchText, drugInventoryId, PageRequest.of(page, size))
+                        .stream().map(this::toResponseDrugDto).toList())
+                .count(
+                        drugRepo.findAllDrugsCount(searchText,drugInventoryId)
+                )
+                .build();
+
     }
 
+    private String getUserInventoryId(String token){
+
+        SystemUser systemUser=systemUserServiceImpl.getUserByToken(token);
+
+        if(systemUser==null){
+            throw new EntryNotFoundException("System User Not Found");
+        }
+
+        Optional<DrugInventory> userDrugInventory= drugInventoryRepo.findById(systemUser.getPharmacist().getPharmacy().getDrugInventory().getInventoryId());
+
+        if(userDrugInventory.isEmpty()){
+            throw new EntryNotFoundException("Pharmacy Inventory Not Found");
+        }
+
+        return userDrugInventory.get().getInventoryId();
+    }
+
+    private ResponseDrugDto toResponseDrugDto(Drug drug){
+
+        if(drug==null){
+            return null;
+        }
+
+        return ResponseDrugDto.builder()
+                .drugId(drug.getDrugId())
+                .drugName(drug.getDrugName())
+                .drugDescription(drug.getDrugDescription())
+                .stockQty(drug.getDrugDescription())
+                .build();
+    }
 
 }

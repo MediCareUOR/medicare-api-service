@@ -1,6 +1,6 @@
 package com.rucreativedeveloper.medicare_api_service.dto.paginated;
 
-import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseDrugDto;
 import lombok.*;
 
 import java.util.List;
@@ -12,5 +12,5 @@ import java.util.List;
 @Builder
 public class ResponseDrugPaginatedDto {
     private long count;
-    private List<ResponsePharmacistDto> dataList;
+    private List<ResponseDrugDto> dataList;
 }

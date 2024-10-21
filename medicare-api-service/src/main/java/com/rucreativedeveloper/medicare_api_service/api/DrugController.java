@@ -1,6 +1,7 @@
 package com.rucreativedeveloper.medicare_api_service.api;
 
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestDrugDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseDrugDto;
 import com.rucreativedeveloper.medicare_api_service.service.DrugService;
 import com.rucreativedeveloper.medicare_api_service.util.StandardResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +43,13 @@ public class DrugController {
 
         return new ResponseEntity<>(
                 new StandardResponseDto(
-                        201,"You have successfully updated",drugId
+                        201,"You have successfully updated",requestDrugDto
                 ), HttpStatus.OK
         );
     }
 
 
-    @DeleteMapping("delete-drug/{drugId}")
+    @DeleteMapping("/delete-drug/{drugId}")
     @PreAuthorize("hasAnyRole('ROLE_PHARMACIST','ROLE_ADMIN')")
     public ResponseEntity<StandardResponseDto> delete(@PathVariable(name="drugId") String drugId){
 
@@ -63,7 +64,43 @@ public class DrugController {
     }
 
 
+    @GetMapping("/get-by-id/{drugId}")
+    @PreAuthorize("hasRole('ROLE_PHARMACIST')")
 
+    public ResponseEntity<StandardResponseDto> getById(@PathVariable(name="drugId") String drugId,@RequestHeader("Authorization") String token){
+
+        ResponseDrugDto dto=drugService.findDrug(drugId,token);
+
+        if(dto==null){
+            return new ResponseEntity<>(
+                    new StandardResponseDto(
+                            404,"Drug Not found",drugId
+                    ), HttpStatus.NOT_FOUND
+            );
+        }
+        return new ResponseEntity<>(
+                new StandardResponseDto(
+                        201,"Your Drug is:",dto
+                ), HttpStatus.OK
+        );
+
+
+    }
+
+    @GetMapping("/get-all-drugs")
+    @PreAuthorize("hasRole('ROLE_PHARMACIST')")
+
+    public ResponseEntity<StandardResponseDto> getAllDrugs(@RequestHeader("Authorization") String token,
+                                                           @RequestParam String searchText,
+                                                           @RequestParam int page,
+                                                           @RequestParam int size){
+
+        return new ResponseEntity<>(
+                new StandardResponseDto(200, "drug data",
+                        drugService.findAllDrugs(token , searchText, page, size)),
+                HttpStatus.OK
+        );
+    }
 
 
 }

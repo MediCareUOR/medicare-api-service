@@ -10,6 +10,7 @@ import lombok.*;
 public class ResponseDrugDto {
 
     private String drugId;
+    private String drugName;
     private String drugDescription;
     private String stockQty;
 
