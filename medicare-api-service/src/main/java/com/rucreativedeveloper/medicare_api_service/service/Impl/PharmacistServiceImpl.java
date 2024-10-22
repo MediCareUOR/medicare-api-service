@@ -9,11 +9,13 @@ import com.rucreativedeveloper.medicare_api_service.exception.EntryNotFoundExcep
 import com.rucreativedeveloper.medicare_api_service.repository.*;
 import com.rucreativedeveloper.medicare_api_service.service.PharmacistService;
 import com.rucreativedeveloper.medicare_api_service.service.SystemUserService;
+import com.rucreativedeveloper.medicare_api_service.service.process.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -28,9 +30,10 @@ public class PharmacistServiceImpl implements PharmacistService {
     private final PharmacyRepo pharmacyRepo;
     private final PasswordEncoder passwordEncoder;
     private final DrugInventoryRepo drugInventoryRepo;
+    private final EmailService emailService;
 
     @Override
-    public void registerPharmacist(RequestPharmacistDto requestPharmacistDto) {
+    public void registerPharmacist(RequestPharmacistDto requestPharmacistDto) throws IOException {
 
         SystemUser savedSystemUser=systemUserRepo.findByUsername(requestPharmacistDto.getRequestSystemUser().getUsername());
 
@@ -55,7 +58,7 @@ public class PharmacistServiceImpl implements PharmacistService {
                     .isAccountNonExpired(true)
                     .isAccountNonLocked(true)
                     .isCredentialsNonExpired(true)
-                    .isEnabled(true)
+                    .isEnabled(false)
                     .build();
 
             systemUserRepo.save(newSystemUser);
@@ -94,6 +97,8 @@ public class PharmacistServiceImpl implements PharmacistService {
 
             drugInventoryRepo.save(drugInventory);
 
+
+            emailService.sendPharmacistWaiting(newSystemUser.getUsername(), "Your Account is Pending Activation – Awaiting Admin Approval");
 
         }
 
@@ -181,7 +186,7 @@ public class PharmacistServiceImpl implements PharmacistService {
                 .contactNumber(pharmacy.get().getContactNumber())
                 .build();
 
-//        ResponsePharmacyDto responsePharmacyDto=toResponsePharmacyDto(pharmacy.get());
+
 
         return ResponsePharmacistDto.builder()
                 .pharmacistId(pharmacistId)
@@ -195,6 +200,38 @@ public class PharmacistServiceImpl implements PharmacistService {
     @Override
     public ResponsePharmacistPaginatedDto findAllPharmacist(String searchText, int page, int size) {
         return null;
+    }
+
+    @Override
+    public void verifyPharmacist(String pharmacistId) throws IOException {
+
+        Optional<Pharmacist> foundPharmacist=pharmacistRepo.findById(pharmacistId);
+
+        System.out.println("works 1");
+        if(foundPharmacist.isEmpty()){
+            throw new EntryNotFoundException("Pharmacist with id: "+pharmacistId+" not found");
+        }
+        System.out.println("works 2");
+
+        Pharmacist pharmacist=foundPharmacist.get();
+
+        Optional<SystemUser> systemUser=systemUserRepo.findById(pharmacist.getSystemUser().getUserId());
+
+        if(systemUser.isEmpty()){
+            throw new EntryNotFoundException("System User not found");
+        }
+        System.out.println("works 3");
+
+        SystemUser firstSystemUser=systemUser.get();
+
+        firstSystemUser.setEnabled(true);
+
+        systemUserRepo.save(firstSystemUser);
+
+
+        emailService.sendPharmacistVerified(firstSystemUser.getUsername(), "Your Account Has Been Activated – Access Now");
+
+
     }
 
 //    private ResponsePharmacistDto toResponsePharmacistDTO(Pharmacist pharmacist,ResponsePharmacyDto responsePharmacyDto) {

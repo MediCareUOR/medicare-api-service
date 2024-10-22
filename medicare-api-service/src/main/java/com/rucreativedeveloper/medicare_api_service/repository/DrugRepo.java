@@ -19,6 +19,4 @@ public interface DrugRepo extends JpaRepository<Drug,String> {
     public long findAllDrugsCount(String searchText,String inventoryId);
 
 
-
-
 }
