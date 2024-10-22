@@ -12,9 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PharmacyRepo extends JpaRepository<Pharmacy, String> {
 
-    @Query(value = "SELECT * FROM pharmacy WHERE district LIKE %?1% ORDER BY pharmacy_name DESC",nativeQuery = true)
-    public Page<Pharmacy> findPharmacyByDistrict(String district, Pageable pageable);
-
 
 
 }

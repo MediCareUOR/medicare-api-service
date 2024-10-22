@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public class ResponsePharmacistPaginatedDto {
 
-    private long count;
     private List<ResponsePharmacistDto> dataList;
+    private long count;
 
 }
