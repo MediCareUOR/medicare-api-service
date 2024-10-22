@@ -11,6 +11,7 @@ public class ResponseUserPharmacyDto {
 
     private String pharmacyName;
     private String address;
+    private String contactNumber;
     private String district;
     private String city;
     private String longitude;

@@ -217,6 +217,7 @@ public class DrugServiceImpl implements DrugService {
                 .userPharmacyDto(ResponseUserPharmacyDto.builder()
                         .pharmacyName(drug.getInventory().getPharmacy().getPharmacyName())
                         .address(drug.getInventory().getPharmacy().getAddress())
+                        .contactNumber(drug.getInventory().getPharmacy().getContactNumber())
                         .district(drug.getInventory().getPharmacy().getDistrict())
                         .city(drug.getInventory().getPharmacy().getCity())
                         .longitude(drug.getInventory().getPharmacy().getLongitude())
