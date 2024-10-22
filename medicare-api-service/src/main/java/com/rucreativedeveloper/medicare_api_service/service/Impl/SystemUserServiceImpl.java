@@ -1,7 +1,9 @@
 package com.rucreativedeveloper.medicare_api_service.service.Impl;
 
 
+import com.rucreativedeveloper.medicare_api_service.config.JwtConfig;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestSystemUserDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseSystemUserDto;
 import com.rucreativedeveloper.medicare_api_service.entity.SystemUser;
 import com.rucreativedeveloper.medicare_api_service.entity.UserRole;
 import com.rucreativedeveloper.medicare_api_service.exception.DuplicateEntryException;
@@ -12,14 +14,20 @@ import com.rucreativedeveloper.medicare_api_service.security.ApplicationSecurity
 import com.rucreativedeveloper.medicare_api_service.service.SystemUserService;
 import com.rucreativedeveloper.medicare_api_service.service.process.EmailService;
 import com.rucreativedeveloper.medicare_api_service.util.Generator;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.*;
 
@@ -35,6 +43,8 @@ public class SystemUserServiceImpl implements SystemUserService {
     private final PasswordEncoder passwordEncoder;
     private final Generator generator;
     private final EmailService emailService;
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
 
     @Override
     public void signupUser(RequestSystemUserDto dto) throws IOException {
@@ -79,13 +89,18 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Override
     public boolean verifyEmail(String email, String otp) {
 
+        System.out.println(email);
+
         SystemUser user=systemUserRepo.findByUsername(email);
+
+        System.out.println(user.getUserId());
+
 
         if(user.isEnabled()){
             throw new DuplicateEntryException("User Already Verified");
         }
 
-        if(user.getOtp()==otp){
+        if(Objects.equals(user.getOtp(), otp)){
             user.setEnabled(true);
             systemUserRepo.save(user);
             return true;
@@ -158,5 +173,40 @@ public class SystemUserServiceImpl implements SystemUserService {
                 grantedAuthorities
         );
 
+    }
+
+    public SystemUser getUserByToken(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        } else {
+            return null;
+        }
+        assert token != null;
+        ResponseSystemUserDto userData = getAllSystemUserData(token);
+        Optional<SystemUser> user = systemUserRepo.findById(userData.getUserId());
+        if (user.isEmpty()) {
+            throw new EntryNotFoundException("User Not Found");
+        }
+        return user.get();
+    }
+
+
+    @Override
+    public ResponseSystemUserDto getAllSystemUserData(String token) {
+        String realToken = token.replace(jwtConfig.getTokenPrefix(), "");
+        Jws<Claims> claimsJws = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(realToken);
+        String username = claimsJws.getBody().getSubject();
+        SystemUser selectedUser = systemUserRepo.findByUsername(username);
+        if (selectedUser == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseSystemUserDto(
+                selectedUser.getUserId(),
+                selectedUser.getUsername(),
+                selectedUser.getRoles().toString()
+        );
     }
 }
