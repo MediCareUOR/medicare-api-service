@@ -69,4 +69,46 @@ public class EmailServiceImpl implements EmailService {
             return false;
         }
     }
+
+    @Override
+    public boolean sendPharmacistWaiting(String toEmail, String subject) throws IOException {
+        try {
+            String htmlBody = emailTemplateHelper.loadHtmlTemplate("templates/pharmacist-waiting-message.html");
+            htmlBody = htmlBody.replace("${year}", String.valueOf(Year.now().getValue()));
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true);
+
+            javaMailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean sendPharmacistVerified(String toEmail, String subject) throws IOException {
+        try {
+            String htmlBody = emailTemplateHelper.loadHtmlTemplate("templates/pharmacist-verified-by-admin.html");
+            htmlBody = htmlBody.replace("${year}", String.valueOf(Year.now().getValue()));
+
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(senderEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true);
+
+            javaMailSender.send(message);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -6,11 +6,13 @@ import com.rucreativedeveloper.medicare_api_service.repository.UserRoleRepo;
 import com.rucreativedeveloper.medicare_api_service.service.UserRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserRoleServiceImpl implements UserRoleService {
 

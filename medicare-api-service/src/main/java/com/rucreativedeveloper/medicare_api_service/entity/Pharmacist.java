@@ -16,24 +16,19 @@ public class Pharmacist {
     @Column(name = "pharmacist_Id")
     private String pharmacistId;
 
-    @Column(name="registrationNumber")
-    private String registrationNumber;
-
     private String firstName;
 
     private String lastName;
-
-    private String email;
 
     private String phoneNumber;
 
     private String address;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id",referencedColumnName = "user_id")
     private SystemUser systemUser;
 
-    @ManyToOne
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name="pharmacy_id",referencedColumnName = "pharmacy_id")
     private Pharmacy pharmacy;
 
