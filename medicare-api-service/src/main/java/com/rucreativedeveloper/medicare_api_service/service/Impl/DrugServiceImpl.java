@@ -2,11 +2,9 @@ package com.rucreativedeveloper.medicare_api_service.service.Impl;
 
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponseDrugPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponsePharmacistPaginatedDto;
+import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponseUserDrugPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestDrugDto;
-import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseDrugDto;
-import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseDrugInventoryDto;
-import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacyDto;
-import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseSystemUserDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.*;
 import com.rucreativedeveloper.medicare_api_service.entity.*;
 import com.rucreativedeveloper.medicare_api_service.exception.DuplicateEntryException;
 import com.rucreativedeveloper.medicare_api_service.exception.EntryNotFoundException;
@@ -54,6 +52,8 @@ public class DrugServiceImpl implements DrugService {
         Drug drug= Drug.builder()
                 .drugId(UUID.randomUUID().toString())
                 .drugName(requestDrugDto.getDrugName())
+                .brandName(requestDrugDto.getBrandName())
+                .unitPrice(requestDrugDto.getUnitPrice())
                 .drugDescription(requestDrugDto.getDrugDescription())
                 .stockQty(requestDrugDto.getStockQty())
                 .inventory(drugInventory)
@@ -77,6 +77,8 @@ public class DrugServiceImpl implements DrugService {
 
         drug.setDrugName(requestDrugDto.getDrugName());
         drug.setDrugDescription(requestDrugDto.getDrugDescription());
+        drug.setBrandName(requestDrugDto.getBrandName());
+        drug.setUnitPrice(requestDrugDto.getUnitPrice());
         drug.setStockQty(requestDrugDto.getStockQty());
 
         drugRepo.save(drug);
@@ -142,6 +144,36 @@ public class DrugServiceImpl implements DrugService {
 
     }
 
+    @Override
+    public ResponseUserDrugPaginatedDto userFindAllDrugs(String searchText,String district, int page, int size) {
+
+            if(district != null && !district.trim().isEmpty()){
+
+                System.out.println("Error in 1");
+                return ResponseUserDrugPaginatedDto.builder()
+                        .dataList(
+                                drugRepo.findDrugsWithPharmacyDetails(district,searchText,PageRequest.of(page,size)).stream().map(
+                                        this::mapToResponseDto
+                                ).toList()
+                        )
+                        .count(drugRepo.findDrugsCountWithPharmacyDetails(searchText,district))
+                        .build();
+
+              }else{
+                System.out.println("Error in 2 start");
+                return ResponseUserDrugPaginatedDto.builder()
+                        .dataList(
+                                drugRepo.findDrugsWithPharmacyDetailsByNameOrBrand(searchText,PageRequest.of(page,size)).stream().map(
+                                        this::mapToResponseDto
+                                ).toList()
+                        )
+                        .count(drugRepo.findDrugsCountWithPharmacyDetailsByNameOrBrand(searchText))
+                        .build();
+
+
+            }
+    }
+
     private String getUserInventoryId(String token){
 
         SystemUser systemUser=systemUserServiceImpl.getUserByToken(token);
@@ -168,8 +200,28 @@ public class DrugServiceImpl implements DrugService {
         return ResponseDrugDto.builder()
                 .drugId(drug.getDrugId())
                 .drugName(drug.getDrugName())
+                .brandName(drug.getBrandName())
+                .unitPrice(drug.getUnitPrice())
                 .drugDescription(drug.getDrugDescription())
                 .stockQty(drug.getDrugDescription())
+                .build();
+    }
+
+
+    private ResponseUserDrugDto mapToResponseDto(Drug drug) {
+
+        return ResponseUserDrugDto.builder()
+                .drugName(drug.getDrugName())
+                .brandName(drug.getBrandName())
+                .unitPrice(drug.getUnitPrice())
+                .userPharmacyDto(ResponseUserPharmacyDto.builder()
+                        .pharmacyName(drug.getInventory().getPharmacy().getPharmacyName())
+                        .address(drug.getInventory().getPharmacy().getAddress())
+                        .district(drug.getInventory().getPharmacy().getDistrict())
+                        .city(drug.getInventory().getPharmacy().getCity())
+                        .longitude(drug.getInventory().getPharmacy().getLongitude())
+                        .latitude(drug.getInventory().getPharmacy().getLatitude())
+                        .build())
                 .build();
     }
 

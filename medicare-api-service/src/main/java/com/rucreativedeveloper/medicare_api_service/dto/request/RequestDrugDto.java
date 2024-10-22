@@ -11,6 +11,8 @@ import lombok.*;
 public class RequestDrugDto {
 
     private String drugName;
+    private String brandName;
+    private String unitPrice;
     private String drugDescription;
     private String stockQty;
 

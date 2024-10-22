@@ -27,14 +27,17 @@ public class SystemUserController {
         );
     }
 
-    @PostMapping(path={"/verify-email"},params = {"otp", "email"})
-    public ResponseEntity<StandardResponseDto> verifyEmail(@RequestParam String otp, @RequestParam String email) {
+    @PostMapping(path={"/visitor/verify-email"},params = {"otp", "email"})
+    public ResponseEntity<StandardResponseDto> verifyEmail(@RequestParam(name="email") String email, @RequestParam(name="otp") String otp) {
 
-        boolean isVerified = userService.verifyEmail(otp, email);
+
+
+        boolean isVerified = userService.verifyEmail(email,otp);
        if(isVerified) {
            return new ResponseEntity<>(
                    new StandardResponseDto(201, "Email successfully verified", null), HttpStatus.OK
            );
+
        }else{
            return new ResponseEntity<>(
                    new StandardResponseDto(400,

@@ -87,7 +87,7 @@ public class DrugController {
 
     }
 
-    @GetMapping("/get-all-drugs")
+    @GetMapping("/pharmacist/get-all-drugs")
     @PreAuthorize("hasRole('ROLE_PHARMACIST')")
 
     public ResponseEntity<StandardResponseDto> getAllDrugs(@RequestHeader("Authorization") String token,
@@ -101,6 +101,25 @@ public class DrugController {
                 HttpStatus.OK
         );
     }
+
+
+
+    @GetMapping("/user/get-all-drugs")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<StandardResponseDto> userGetAllDrugs(
+            @RequestParam String searchText,
+            @RequestParam String district,
+            @RequestParam int page,
+            @RequestParam int size
+    ){
+        return new ResponseEntity<>(
+                new StandardResponseDto(200, "drug data",
+                        drugService.userFindAllDrugs(searchText, district, page, size)),
+                HttpStatus.OK
+        );
+
+    }
+
 
 
 }

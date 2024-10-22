@@ -19,6 +19,10 @@ public class Drug {
 
     private String drugDescription;
 
+    private String brandName;
+
+    private String unitPrice;
+
     private String stockQty;
 
     @ManyToOne(fetch = FetchType.LAZY)

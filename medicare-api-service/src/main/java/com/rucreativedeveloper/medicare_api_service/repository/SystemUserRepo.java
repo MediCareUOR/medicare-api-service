@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface SystemUserRepo extends JpaRepository<SystemUser,String> {
 
-    SystemUser findByUsername(String username);
+   public SystemUser findByUsername(String username);
 
 
 

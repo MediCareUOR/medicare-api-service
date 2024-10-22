@@ -7,15 +7,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseDrugDto {
+public class ResponseUserDrugDto {
 
-    private String drugId;
     private String drugName;
     private String brandName;
     private String unitPrice;
-    private String drugDescription;
-    private String stockQty;
 
-    private ResponseDrugInventoryDto responseDrugInventoryDto;
+    private ResponseUserPharmacyDto userPharmacyDto;
 
 }

@@ -57,7 +57,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfiguration {
                 .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
 
-                        .requestMatchers("/api/v1/system-users/visitor/**").permitAll()
+                        .requestMatchers("/api/v1/system-users/**").permitAll()
                         .requestMatchers("/api/v1/pharmacist/**").permitAll()
                         .requestMatchers("api/v1/drugs/**").permitAll()
                         .anyRequest()

@@ -89,13 +89,18 @@ public class SystemUserServiceImpl implements SystemUserService {
     @Override
     public boolean verifyEmail(String email, String otp) {
 
+        System.out.println(email);
+
         SystemUser user=systemUserRepo.findByUsername(email);
+
+        System.out.println(user.getUserId());
+
 
         if(user.isEnabled()){
             throw new DuplicateEntryException("User Already Verified");
         }
 
-        if(user.getOtp()==otp){
+        if(Objects.equals(user.getOtp(), otp)){
             user.setEnabled(true);
             systemUserRepo.save(user);
             return true;
