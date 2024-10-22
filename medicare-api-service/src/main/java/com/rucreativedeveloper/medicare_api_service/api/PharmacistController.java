@@ -85,7 +85,7 @@ public class PharmacistController {
     ){
 
         return new ResponseEntity<>(
-                new StandardResponseDto(201,"Your Pharmacists are",searchText), HttpStatus.OK
+                new StandardResponseDto(201,"Your Pharmacists are",pharmacistService.findAllPharmacist(searchText, page, size)), HttpStatus.OK
         );
 
     }

@@ -1,9 +1,11 @@
 package com.rucreativedeveloper.medicare_api_service.service.Impl;
 
+import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponseDrugPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponsePharmacistPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestPharmacistDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacyDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseSystemUserDto;
 import com.rucreativedeveloper.medicare_api_service.entity.*;
 import com.rucreativedeveloper.medicare_api_service.exception.EntryNotFoundException;
 import com.rucreativedeveloper.medicare_api_service.repository.*;
@@ -12,6 +14,7 @@ import com.rucreativedeveloper.medicare_api_service.service.SystemUserService;
 import com.rucreativedeveloper.medicare_api_service.service.process.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -199,7 +202,14 @@ public class PharmacistServiceImpl implements PharmacistService {
 
     @Override
     public ResponsePharmacistPaginatedDto findAllPharmacist(String searchText, int page, int size) {
-        return null;
+
+        return ResponsePharmacistPaginatedDto.builder()
+                .dataList(pharmacistRepo.getAllPharmacists(searchText, PageRequest.of(page, size))
+                        .stream().map(this:: mapToResponsePaginatedDto).toList())
+                .count(
+                        pharmacistRepo.getPharmacistCount(searchText)
+                )
+                .build();
     }
 
     @Override
@@ -233,6 +243,36 @@ public class PharmacistServiceImpl implements PharmacistService {
 
 
     }
+
+    private ResponsePharmacistDto mapToResponsePaginatedDto(Pharmacist pharmacist) {
+
+
+        if(pharmacist==null){
+            return null;
+        }
+        return ResponsePharmacistDto.builder()
+                .pharmacistId(pharmacist.getPharmacistId())
+                .pharmacistName(pharmacist.getFirstName()+" "+pharmacist.getLastName())
+                .phoneNumber(pharmacist.getPhoneNumber())
+                .responseSystemUser(ResponseSystemUserDto.builder()
+                        .userName(pharmacist.getSystemUser().getUsername())
+                        .build())
+                .responsePharmacy(
+                        ResponsePharmacyDto.builder()
+                                .pharmacyName(pharmacist.getPharmacy().getPharmacyName())
+                                .address(pharmacist.getPharmacy().getAddress())
+                                .contactNumber(pharmacist.getPharmacy().getContactNumber())
+                                .district(pharmacist.getPharmacy().getDistrict())
+                                .postal(pharmacist.getPharmacy().getPostal())
+                                .latitude(pharmacist.getPharmacy().getLatitude())
+                                .longitude(pharmacist.getPharmacy().getLongitude())
+                                .build()
+                )
+                .build();
+    }
+
+
+
 
 //    private ResponsePharmacistDto toResponsePharmacistDTO(Pharmacist pharmacist,ResponsePharmacyDto responsePharmacyDto) {
 //        if (pharmacist == null) {
