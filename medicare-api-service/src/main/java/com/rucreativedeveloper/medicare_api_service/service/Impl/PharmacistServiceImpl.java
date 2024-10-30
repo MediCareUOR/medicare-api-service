@@ -4,9 +4,11 @@ import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponseDrugPa
 import com.rucreativedeveloper.medicare_api_service.dto.paginated.ResponsePharmacistPaginatedDto;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestPharmacistDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistDto;
+import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistUserDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacyDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponseSystemUserDto;
 import com.rucreativedeveloper.medicare_api_service.entity.*;
+import com.rucreativedeveloper.medicare_api_service.exception.DuplicateEntryException;
 import com.rucreativedeveloper.medicare_api_service.exception.EntryNotFoundException;
 import com.rucreativedeveloper.medicare_api_service.repository.*;
 import com.rucreativedeveloper.medicare_api_service.service.PharmacistService;
@@ -40,8 +42,9 @@ public class PharmacistServiceImpl implements PharmacistService {
 
         SystemUser savedSystemUser=systemUserRepo.findByUsername(requestPharmacistDto.getRequestSystemUser().getUsername());
 
+
         if(savedSystemUser!=null){
-         return;
+                throw new DuplicateEntryException("You already registered as a pharmacist");
         }
 
         Optional<UserRole> selectedUserRoleData = userRoleRepo.findByRoleName("PHARMACIST");
@@ -244,6 +247,12 @@ public class PharmacistServiceImpl implements PharmacistService {
 
     }
 
+    @Override
+    public long pharmacistCount() {
+
+        return pharmacistRepo.pharmacistTotalCount();
+    }
+
     private ResponsePharmacistDto mapToResponsePaginatedDto(Pharmacist pharmacist) {
 
 
@@ -254,8 +263,9 @@ public class PharmacistServiceImpl implements PharmacistService {
                 .pharmacistId(pharmacist.getPharmacistId())
                 .pharmacistName(pharmacist.getFirstName()+" "+pharmacist.getLastName())
                 .phoneNumber(pharmacist.getPhoneNumber())
-                .responseSystemUser(ResponseSystemUserDto.builder()
+                .responsePharmacistUserDto(ResponsePharmacistUserDto.builder()
                         .userName(pharmacist.getSystemUser().getUsername())
+                        .isEnable(pharmacist.getSystemUser().isEnabled())
                         .build())
                 .responsePharmacy(
                         ResponsePharmacyDto.builder()
@@ -271,38 +281,5 @@ public class PharmacistServiceImpl implements PharmacistService {
                 .build();
     }
 
-
-
-
-//    private ResponsePharmacistDto toResponsePharmacistDTO(Pharmacist pharmacist,ResponsePharmacyDto responsePharmacyDto) {
-//        if (pharmacist == null) {
-//            return null;
-//        }
-//
-//        return ResponsePharmacistDto.builder()
-//                .pharmacistId(pharmacist.getPharmacistId())
-//                .pharmacistName(pharmacist.getFirstName()+" "+pharmacist.getLastName())
-//                .phoneNumber(pharmacist.getPhoneNumber())
-//                .build();
-//    }
-//
-//
-//    private ResponsePharmacyDto toResponsePharmacyDto(Pharmacy pharmacy){
-//        if (pharmacy == null) {
-//            return null;
-//        }
-//
-//        return ResponsePharmacyDto.builder()
-//                .pharmacyName(pharmacy.getPharmacyName())
-//                .pharmacyId(pharmacy.getPharmacyId())
-//                .address(pharmacy.getAddress())
-//                .city(pharmacy.getCity())
-//                .district(pharmacy.getDistrict())
-//                .postal(pharmacy.getPostal())
-//                .latitude(pharmacy.getLatitude())
-//                .longitude(pharmacy.getLongitude())
-//                .contactNumber(pharmacy.getContactNumber())
-//                .build();
-//    }
 
 }

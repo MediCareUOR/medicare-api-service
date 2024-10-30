@@ -7,6 +7,7 @@ import com.rucreativedeveloper.medicare_api_service.util.StandardResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class SystemUserController {
     @PostMapping("/visitor/signup") // http://localhost:8081/api/v1/system-users/visitor/signup
     public ResponseEntity<StandardResponseDto> signup(@RequestBody RequestSystemUserDto dto) throws IOException {
         userService.signupUser(dto);
+
         return new ResponseEntity<>(
                 new StandardResponseDto(201, "Verify Your Account with OTP", null),
                 HttpStatus.CREATED
@@ -29,8 +31,6 @@ public class SystemUserController {
 
     @PostMapping(path={"/visitor/verify-email"},params = {"otp", "email"})
     public ResponseEntity<StandardResponseDto> verifyEmail(@RequestParam(name="email") String email, @RequestParam(name="otp") String otp) {
-
-
 
         boolean isVerified = userService.verifyEmail(email,otp);
        if(isVerified) {
@@ -48,6 +48,16 @@ public class SystemUserController {
 
     }
 
+
+    @GetMapping("/admin/get-all-users-count")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<StandardResponseDto> getAllUsersCount() {
+        return new ResponseEntity<>(
+                new StandardResponseDto(
+                        201,"Total Users Count",userService.getAllUserCount()
+                ),HttpStatus.OK
+                );
+    }
 
 
 

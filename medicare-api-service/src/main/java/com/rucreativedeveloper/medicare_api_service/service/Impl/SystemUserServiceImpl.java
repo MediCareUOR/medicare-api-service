@@ -209,4 +209,9 @@ public class SystemUserServiceImpl implements SystemUserService {
                 selectedUser.getRoles().toString()
         );
     }
+
+    @Override
+    public Long getAllUserCount() {
+        return systemUserRepo.getAllUsersCount();
+    }
 }
