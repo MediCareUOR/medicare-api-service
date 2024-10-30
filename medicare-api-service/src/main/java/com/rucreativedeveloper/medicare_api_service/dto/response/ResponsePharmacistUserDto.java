@@ -9,5 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ResponsePharmacistUserDto {
+
     private String userName;
+
+    private boolean isEnable;
 }

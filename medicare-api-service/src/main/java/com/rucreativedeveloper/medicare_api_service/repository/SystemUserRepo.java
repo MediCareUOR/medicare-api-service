@@ -13,7 +13,8 @@ public interface SystemUserRepo extends JpaRepository<SystemUser,String> {
 
    public SystemUser findByUsername(String username);
 
-
+   @Query("SELECT COUNT(*) FROM system_user ")
+   public Long getAllUsersCount();
 
 
 }
