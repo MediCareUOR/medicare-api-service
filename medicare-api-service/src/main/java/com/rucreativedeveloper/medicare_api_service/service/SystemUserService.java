@@ -21,4 +21,6 @@ public interface SystemUserService extends UserDetailsService {
     SystemUser getUserByToken(String token);
 
     ResponseSystemUserDto getAllSystemUserData(String token);
+
+    public Long getAllUserCount();
 }

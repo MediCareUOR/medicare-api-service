@@ -54,10 +54,11 @@ public class SystemUserController {
     public ResponseEntity<StandardResponseDto> getAllUsersCount() {
         return new ResponseEntity<>(
                 new StandardResponseDto(
-                        201,"Total Users Count",null
+                        201,"Total Users Count",userService.getAllUserCount()
                 ),HttpStatus.OK
                 );
     }
+
 
 
 }
