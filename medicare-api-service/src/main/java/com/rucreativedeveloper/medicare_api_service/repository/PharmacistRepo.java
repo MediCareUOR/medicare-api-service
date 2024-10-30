@@ -21,6 +21,7 @@ public interface PharmacistRepo extends JpaRepository<Pharmacist, String> {
     @Query(value = "SELECT COUNT(*) FROM pharmacist WHERE (pharmacist_Id LIKE %?1% OR first_name LIKE %?1% OR last_name LIKE %?1%)",nativeQuery = true)
     public Long getPharmacistCount(String searchText);
 
-
+    @Query(value="SELECT COUNT(*) FROM pharmacist",nativeQuery = true)
+    public Long pharmacistTotalCount();
 
 }

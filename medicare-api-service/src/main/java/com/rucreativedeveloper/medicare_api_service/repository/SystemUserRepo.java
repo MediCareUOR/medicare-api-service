@@ -15,5 +15,4 @@ public interface SystemUserRepo extends JpaRepository<SystemUser,String> {
 
 
 
-
 }

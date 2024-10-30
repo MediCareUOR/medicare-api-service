@@ -21,4 +21,6 @@ public interface PharmacistService {
     public ResponsePharmacistPaginatedDto findAllPharmacist(String searchText, int page, int size);
 
     void verifyPharmacist(String pharmacistId) throws IOException;
+
+    public long pharmacistCount();
 }

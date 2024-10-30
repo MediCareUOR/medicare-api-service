@@ -17,5 +17,5 @@ public class ResponsePharmacistDto {
 
     private ResponsePharmacyDto responsePharmacy;
 
-    private ResponseSystemUserDto responseSystemUser;
+    private ResponsePharmacistUserDto responsePharmacistUserDto;
 }

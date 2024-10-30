@@ -3,6 +3,7 @@ package com.rucreativedeveloper.medicare_api_service.api;
 import com.rucreativedeveloper.medicare_api_service.dto.request.RequestPharmacistDto;
 import com.rucreativedeveloper.medicare_api_service.dto.response.ResponsePharmacistDto;
 import com.rucreativedeveloper.medicare_api_service.service.PharmacistService;
+import com.rucreativedeveloper.medicare_api_service.service.PharmacyService;
 import com.rucreativedeveloper.medicare_api_service.util.StandardResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.io.IOException;
 public class PharmacistController {
 
     private final PharmacistService pharmacistService;
+
 
     @PostMapping("/register-pharmacist")
     public ResponseEntity<StandardResponseDto> registerPharmacist(@RequestBody RequestPharmacistDto requestPharmacistDto) throws IOException {
@@ -100,6 +102,17 @@ public class PharmacistController {
                 new StandardResponseDto(201,"You have successfully activated pharmacist:",pharmacistId), HttpStatus.OK
         );
 
+    }
+
+    @GetMapping("/admin/get-all-pharmacy-count")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<StandardResponseDto> getAllPharmacyCount(
+    ){
+        return new ResponseEntity<>(
+                new StandardResponseDto(
+                        201,"Your pharmacy count is",pharmacistService.pharmacistCount()
+                ),HttpStatus.OK
+        );
     }
 
 
