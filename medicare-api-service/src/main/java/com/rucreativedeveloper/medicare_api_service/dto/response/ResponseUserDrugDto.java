@@ -12,6 +12,7 @@ public class ResponseUserDrugDto {
     private String drugName;
     private String brandName;
     private String unitPrice;
+    private String stockQty;
 
     private ResponseUserPharmacyDto userPharmacyDto;
 
