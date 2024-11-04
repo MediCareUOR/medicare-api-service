@@ -214,6 +214,7 @@ public class DrugServiceImpl implements DrugService {
                 .drugName(drug.getDrugName())
                 .brandName(drug.getBrandName())
                 .unitPrice(drug.getUnitPrice())
+                .stockQty(drug.getStockQty())
                 .userPharmacyDto(ResponseUserPharmacyDto.builder()
                         .pharmacyName(drug.getInventory().getPharmacy().getPharmacyName())
                         .address(drug.getInventory().getPharmacy().getAddress())
