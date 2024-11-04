@@ -269,7 +269,10 @@ public class PharmacistServiceImpl implements PharmacistService {
                         .build())
                 .responsePharmacy(
                         ResponsePharmacyDto.builder()
+                                .pharmacyId(pharmacist.getPharmacy().getPharmacyId())
                                 .pharmacyName(pharmacist.getPharmacy().getPharmacyName())
+                                .city(pharmacist.getPharmacy().getCity())
+                                .registerNumber(pharmacist.getPharmacy().getRegisterNumber())
                                 .address(pharmacist.getPharmacy().getAddress())
                                 .contactNumber(pharmacist.getPharmacy().getContactNumber())
                                 .district(pharmacist.getPharmacy().getDistrict())
