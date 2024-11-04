@@ -203,7 +203,7 @@ public class DrugServiceImpl implements DrugService {
                 .brandName(drug.getBrandName())
                 .unitPrice(drug.getUnitPrice())
                 .drugDescription(drug.getDrugDescription())
-                .stockQty(drug.getDrugDescription())
+                .stockQty(drug.getStockQty())
                 .build();
     }
 
