@@ -28,3 +28,7 @@ The backend of the Pharmaceutical Drug Query System enables real-time drug avail
 - **Java 17**: Ensure you have Java 17 installed.
 - **Maven**: Used for building and managing dependencies.
 - **MySQL**: Database server to manage data storage.
+
+## LICENSE
+
+[MIT LICENSE](LICENSE)
